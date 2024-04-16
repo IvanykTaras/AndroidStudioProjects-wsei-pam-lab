@@ -15,6 +15,10 @@ import java.util.Timer
 import kotlin.concurrent.schedule
 
 class Lab03Activity : AppCompatActivity() {
+
+    lateinit var size: IntArray;
+    lateinit var mBoard: GridLayout;
+    lateinit var mBoardModel: MemoryBoardView;
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -25,16 +29,29 @@ class Lab03Activity : AppCompatActivity() {
             insets
         }
 
-        val mBoard: GridLayout = findViewById(R.id.lab03)
-        val size: IntArray? = intent.getIntArrayExtra("size");
+        mBoard = findViewById(R.id.lab03)
+        size = intent.getIntArrayExtra("size") ?: intArrayOf(3,3);
         mBoard.columnCount = size?.first() ?: 10
         mBoard.rowCount = size?.last() ?: 10
 
         val a =  mBoard.columnCount
         val b =  mBoard.rowCount
 
+        mBoardModel = MemoryBoardView(mBoard, mBoard.columnCount, mBoard.columnCount)
 
-        val mBoardModel = MemoryBoardView(mBoard, mBoard.columnCount, mBoard.columnCount)
+        if (savedInstanceState != null) {
+
+            val imagesFromBundle = savedInstanceState.getIntArray("Images");
+            val revealedFromBundle = savedInstanceState.getBooleanArray("Revealed");
+            val tagsFromBundle = savedInstanceState.getStringArray("Tag");
+
+
+            if(imagesFromBundle != null && revealedFromBundle != null && tagsFromBundle != null){
+                mBoardModel.setState(imagesFromBundle, revealedFromBundle, tagsFromBundle);
+            }
+        }
+
+
 
         mBoardModel.setOnGameChangeListener { e ->
             run {
@@ -61,5 +78,29 @@ class Lab03Activity : AppCompatActivity() {
                 }
             }
         }
+
+    }
+
+//    override fun onSaveInstanceState(outState: Bundle) {
+//        super.onSaveInstanceState(outState);
+//
+//        outState.putIntArray("Images", mBoardModel.getState().map { it.id }.toIntArray());
+//        outState.putBooleanArray(
+//            "Revealed",
+//            mBoardModel.getState().map { it.revealed }.toBooleanArray()
+//        );
+//        outState.putStringArray("Tag", mBoardModel.getState().map { it.tag }.toTypedArray());
+//    }
+
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+
+        outState.putIntArray("Images", mBoardModel.getState().map { it.id }.toIntArray());
+        outState.putBooleanArray(
+            "Revealed",
+            mBoardModel.getState().map { it.revealed }.toBooleanArray()
+        );
+        outState.putStringArray("Tag", mBoardModel.getState().map { it.tag }.toTypedArray());
     }
 }

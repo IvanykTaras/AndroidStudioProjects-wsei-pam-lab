@@ -14,7 +14,6 @@ class MemoryBoardView(
 ) {
     private val tiles: MutableMap<String, Tile> = mutableMapOf()
     private val icons: List<Int> = listOf(
-        R.drawable.baseline_deck_24,
         R.drawable.baseline_rocket_launch_24,
         R.drawable.baseline_ac_unit_24,
         R.drawable.baseline_access_alarms_24,
@@ -66,7 +65,7 @@ class MemoryBoardView(
         // tu umieść kod pętli tworzący wszystkie karty, który jest obecnie
         // w aktywności Lab03Activity
     }
-    private val deckResource: Int = R.drawable.baseline_deck_24
+
     private var onGameChangeStateListener: (MemoryGameEvent) -> Unit = { (e) -> }
     private val matchedPair: Stack<Tile> = Stack()
     private val logic: MemoryGameLogic = MemoryGameLogic(cols * rows / 2)
@@ -88,8 +87,39 @@ class MemoryBoardView(
     }
 
     private fun addTile(button: ImageButton, resourceImage: Int) {
+        val deckResource: Int = R.drawable.baseline_deck_24
+
         button.setOnClickListener(::onClickTile)
         val tile = Tile(button, resourceImage, deckResource)
         tiles[button.tag.toString()] = tile
     }
+
+    fun getState(): List<TileState> {
+        val output: MutableList<TileState> = mutableListOf();
+
+        tiles.forEach {
+            var newTileState = TileState(it.value.tileResource, it.value.revealed, it.key);
+            output.add(newTileState);
+        }
+
+        return output;
+    }
+
+    fun setState(imagesArray: IntArray, revealedArray: BooleanArray, tagsArray: Array<String>) {
+        var index: Int = 0;
+        tiles.forEach{
+            it.value.tileResource = imagesArray[index];
+            it.value.revealed = revealedArray[index];
+
+            index++;
+        }
+    }
+
+
 }
+
+data class TileState(
+    val id: Int, //obrazki
+    val revealed: Boolean,
+    val tag: String
+){}
