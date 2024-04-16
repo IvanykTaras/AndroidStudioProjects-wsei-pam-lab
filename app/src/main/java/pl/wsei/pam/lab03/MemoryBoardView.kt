@@ -1,10 +1,15 @@
 package pl.wsei.pam.lab03
 
+import android.animation.Animator
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
 import android.view.Gravity
 import android.view.View
+import android.view.animation.DecelerateInterpolator
 import android.widget.GridLayout
 import android.widget.ImageButton
 import pl.wsei.pam.lab01.R
+import java.util.Random
 import java.util.Stack
 
 class MemoryBoardView(
@@ -80,6 +85,7 @@ class MemoryBoardView(
         if (matchResult != GameStates.Matching) {
             matchedPair.clear()
         }
+
     }
 
     fun setOnGameChangeListener(listener: (event: MemoryGameEvent) -> Unit) {
@@ -113,6 +119,78 @@ class MemoryBoardView(
 
             index++;
         }
+    }
+
+    fun animatePairedButton(button: ImageButton, action: Runnable ) {
+        val set = AnimatorSet()
+        val random = Random()
+        button.pivotX = random.nextFloat() * 200f
+        button.pivotY = random.nextFloat() * 200f
+
+        val rotation = ObjectAnimator.ofFloat(button, "rotation", 1080f)
+        val scallingX = ObjectAnimator.ofFloat(button, "scaleX", 1f, 4f)
+        val scallingY = ObjectAnimator.ofFloat(button, "scaleY", 1f, 4f)
+        val fade = ObjectAnimator.ofFloat(button, "alpha", 1f, 0f)
+        set.startDelay = 500
+        set.duration = 2000
+        set.interpolator = DecelerateInterpolator()
+        set.playTogether(rotation, scallingX, scallingY, fade)
+        set.addListener(object: Animator.AnimatorListener {
+
+            override fun onAnimationStart(animator: Animator) {
+            }
+
+            override fun onAnimationEnd(animator: Animator) {
+                button.scaleX = 1f
+                button.scaleY = 1f
+                button.isEnabled = false;
+                button.alpha = 0.0f
+                action.run();
+            }
+
+            override fun onAnimationCancel(animator: Animator) {
+            }
+
+            override fun onAnimationRepeat(animator: Animator) {
+            }
+        })
+        set.start()
+    }
+
+    fun animateNoPairedButton(button: ImageButton, action: Runnable ) {
+        val set = AnimatorSet()
+        val random = Random()
+
+
+        val rotationLeft = ObjectAnimator.ofFloat(button, "rotation", -25f)
+        val rotationRight = ObjectAnimator.ofFloat(button, "rotation", 25f)
+        val rotationRight2 = ObjectAnimator.ofFloat(button, "rotation", 25f)
+
+        set.startDelay = 0
+        set.duration = 100
+        set.interpolator = DecelerateInterpolator()
+
+        set.playSequentially(rotationRight,rotationLeft,rotationRight2)
+//        set.playTogether(rotationLeft,rotationRight)
+
+        set.addListener(object: Animator.AnimatorListener {
+
+            override fun onAnimationStart(animator: Animator) {
+            }
+
+            override fun onAnimationEnd(animator: Animator) {
+                button.rotation = 25f;
+                button.isEnabled = false;
+                action.run();
+            }
+
+            override fun onAnimationCancel(animator: Animator) {
+            }
+
+            override fun onAnimationRepeat(animator: Animator) {
+            }
+        })
+        set.start()
     }
 
 

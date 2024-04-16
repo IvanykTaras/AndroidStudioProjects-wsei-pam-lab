@@ -1,7 +1,11 @@
 package pl.wsei.pam.lab03
 
+import android.media.MediaPlayer
 import android.os.Bundle
 import android.view.Gravity
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.widget.Button
 import android.widget.GridLayout
 import android.widget.ImageButton
@@ -19,6 +23,11 @@ class Lab03Activity : AppCompatActivity() {
     lateinit var size: IntArray;
     lateinit var mBoard: GridLayout;
     lateinit var mBoardModel: MemoryBoardView;
+
+    lateinit var completionPlayer: MediaPlayer
+    lateinit var negativePLayer: MediaPlayer
+
+    var isSound: Boolean = true;
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -60,14 +69,28 @@ class Lab03Activity : AppCompatActivity() {
                         e.tiles.forEach{it.revealed = true}
                     }
                     GameStates.Match -> {
+                        completionPlayer.start();
+
                         e.tiles.forEach{it.revealed = true}
+                        e.tiles.forEach{ mBoardModel.animatePairedButton(it.button, {
+                            it.button.alpha = 1f
+                            it.button.isEnabled = true;
+                        }) }
                     }
                     GameStates.NoMatch -> {
+                        negativePLayer.start();
+
                         e.tiles.forEach{it.revealed = true}
-                        Timer().schedule(2000) {
+                        e.tiles.forEach{ mBoardModel.animateNoPairedButton(it.button,{
+                            it.button.rotation = 0f
+                            it.button.isEnabled = true;
+                        }) }
+
+                        Timer().schedule(1000) {
                             // kod wykonany po 2000 ms
                             runOnUiThread(){
                                 e.tiles.forEach{it.revealed = false}
+
                             }
 
                         }
@@ -79,8 +102,35 @@ class Lab03Activity : AppCompatActivity() {
             }
         }
 
+
+
     }
 
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean  {
+        val inflater: MenuInflater = getMenuInflater()
+        inflater.inflate(R.menu.board_activity_menu, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when(item.getItemId()){
+            R.id.board_activity_sound -> {
+                if (item.getIcon()?.getConstantState()
+                        ?.equals(getResources().getDrawable(R.drawable.baseline_alarm_on_24, getTheme()).getConstantState()) == true
+                ) {
+                    Toast.makeText(this, "Sound turn off", Toast.LENGTH_SHORT).show();
+                    item.setIcon(R.drawable.baseline_alarm_off_24)
+                    isSound = false;
+                } else {
+                    Toast.makeText(this, "Sound turn on", Toast.LENGTH_SHORT).show()
+                    item.setIcon(R.drawable.baseline_alarm_on_24)
+                    isSound = true
+                }
+            }
+        }
+        return false
+    }
 //    override fun onSaveInstanceState(outState: Bundle) {
 //        super.onSaveInstanceState(outState);
 //
@@ -102,5 +152,18 @@ class Lab03Activity : AppCompatActivity() {
             mBoardModel.getState().map { it.revealed }.toBooleanArray()
         );
         outState.putStringArray("Tag", mBoardModel.getState().map { it.tag }.toTypedArray());
+    }
+
+    override protected fun onResume() {
+        super.onResume()
+        completionPlayer = MediaPlayer.create(applicationContext, R.raw.completion)
+        negativePLayer = MediaPlayer.create(applicationContext, R.raw.negative_guitar)
+    }
+
+
+    override protected fun onPause() {
+        super.onPause();
+        completionPlayer.release()
+        negativePLayer.release()
     }
 }
