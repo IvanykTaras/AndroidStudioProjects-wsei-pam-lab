@@ -15,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import pl.wsei.pam.lab01.R
+import pl.wsei.pam.lab01.databinding.ActivityLab03Binding
 import java.util.Timer
 import kotlin.concurrent.schedule
 
@@ -27,16 +28,21 @@ class Lab03Activity : AppCompatActivity() {
     lateinit var completionPlayer: MediaPlayer
     lateinit var negativePLayer: MediaPlayer
 
+    lateinit var binding: ActivityLab03Binding
+
     var isSound: Boolean = true;
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContentView(R.layout.activity_lab03)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.lab03)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
+//        enableEdgeToEdge()
+//        setContentView(R.layout.activity_lab03)
+//        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.lab03)) { v, insets ->
+//            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+//            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+//            insets
+//        }
+
+        binding = ActivityLab03Binding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         mBoard = findViewById(R.id.lab03)
         size = intent.getIntArrayExtra("size") ?: intArrayOf(3,3);
@@ -71,11 +77,19 @@ class Lab03Activity : AppCompatActivity() {
                     GameStates.Match -> {
                         completionPlayer.start();
 
+//                        if (isSound) {
+//                            completionPlayer.start()
+//                        }
+
                         e.tiles.forEach{it.revealed = true}
                         e.tiles.forEach{ mBoardModel.animatePairedButton(it.button, {}) }
                     }
                     GameStates.NoMatch -> {
-                        negativePLayer.start();
+//                        if (isSound) {
+//                            negativePLayer.start()
+//                        }
+
+                        negativePLayer.start()
 
                         e.tiles.forEach{it.revealed = true}
                         e.tiles.forEach{ mBoardModel.animateNoPairedButton(it.button,{
@@ -83,7 +97,7 @@ class Lab03Activity : AppCompatActivity() {
                             it.button.isEnabled = true;
                         }) }
 
-                        Timer().schedule(1000) {
+                        Timer().schedule(2000) {
                             // kod wykonany po 2000 ms
                             runOnUiThread(){
                                 e.tiles.forEach{it.revealed = false}
@@ -116,6 +130,31 @@ class Lab03Activity : AppCompatActivity() {
 //        outState.putStringArray("Tag", mBoardModel.getState().map { it.tag }.toTypedArray());
 //    }
 
+    override fun onCreateOptionsMenu(menu: Menu): Boolean  {
+        val inflater: MenuInflater  = getMenuInflater()
+        inflater.inflate(R.menu.board_activity_menu, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when(item.getItemId()){
+            R.id.board_activity_sound -> {
+                if (item.getIcon()?.getConstantState()
+                        ?.equals(getResources().getDrawable(R.drawable.baseline_alarm_on_24, getTheme()).getConstantState()) == true
+                ) {
+                    Toast.makeText(this, "Sound turn off", Toast.LENGTH_SHORT).show();
+                    item.setIcon(R.drawable.baseline_alarm_off_24)
+                    isSound = false;
+                } else {
+                    Toast.makeText(this, "Sound turn on", Toast.LENGTH_SHORT).show()
+                    item.setIcon(R.drawable.baseline_alarm_on_24)
+                    isSound = true
+                }
+            }
+        }
+        return false
+    }
+
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
@@ -132,6 +171,7 @@ class Lab03Activity : AppCompatActivity() {
         super.onResume()
         completionPlayer = MediaPlayer.create(applicationContext, R.raw.completion)
         negativePLayer = MediaPlayer.create(applicationContext, R.raw.negative_guitar)
+
     }
 
 
