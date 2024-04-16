@@ -1,11 +1,14 @@
 package pl.wsei.pam.lab06
 
 import android.annotation.SuppressLint
+import android.graphics.Paint
 import android.graphics.Paint.Align
 import android.icu.text.CaseMap.Title
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,9 +21,11 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -42,6 +47,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -50,6 +57,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import pl.wsei.pam.lab01.R
 import pl.wsei.pam.lab06.ui.theme.Lab01Theme
 import java.time.LocalDate
 
@@ -257,10 +265,12 @@ fun ListItem(item: TodoTask, modifier: Modifier = Modifier) {
                 textAlign = TextAlign.Start
             )
         }
-        Row(Modifier.fillMaxWidth()) {
-            Text(
-                text = priorityToString(item.priority),
-                fontSize = 20.sp
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+            var myState: Boolean = false;
+            Checkbox(
+                checked = item.isDone,
+                onCheckedChange = {  myState = it },
+                enabled = false,
             )
         }
 
