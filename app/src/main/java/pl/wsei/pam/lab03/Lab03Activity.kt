@@ -72,10 +72,7 @@ class Lab03Activity : AppCompatActivity() {
                         completionPlayer.start();
 
                         e.tiles.forEach{it.revealed = true}
-                        e.tiles.forEach{ mBoardModel.animatePairedButton(it.button, {
-                            it.button.alpha = 1f
-                            it.button.isEnabled = true;
-                        }) }
+                        e.tiles.forEach{ mBoardModel.animatePairedButton(it.button, {}) }
                     }
                     GameStates.NoMatch -> {
                         negativePLayer.start();
@@ -107,30 +104,7 @@ class Lab03Activity : AppCompatActivity() {
     }
 
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean  {
-        val inflater: MenuInflater = getMenuInflater()
-        inflater.inflate(R.menu.board_activity_menu, menu)
-        return true
-    }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when(item.getItemId()){
-            R.id.board_activity_sound -> {
-                if (item.getIcon()?.getConstantState()
-                        ?.equals(getResources().getDrawable(R.drawable.baseline_alarm_on_24, getTheme()).getConstantState()) == true
-                ) {
-                    Toast.makeText(this, "Sound turn off", Toast.LENGTH_SHORT).show();
-                    item.setIcon(R.drawable.baseline_alarm_off_24)
-                    isSound = false;
-                } else {
-                    Toast.makeText(this, "Sound turn on", Toast.LENGTH_SHORT).show()
-                    item.setIcon(R.drawable.baseline_alarm_on_24)
-                    isSound = true
-                }
-            }
-        }
-        return false
-    }
 //    override fun onSaveInstanceState(outState: Bundle) {
 //        super.onSaveInstanceState(outState);
 //

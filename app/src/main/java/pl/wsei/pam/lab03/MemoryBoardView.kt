@@ -77,7 +77,15 @@ class MemoryBoardView(
 
     private fun onClickTile(v: View) {
         val tile = tiles[v.tag]
-        matchedPair.push(tile)
+        if (tile != null) {
+            if(matchedPair.count() != 0) {
+                if (tile.button.tag == matchedPair.get(0).button.tag) {
+                    return;
+                }
+            }
+            matchedPair.push(tile)
+        }
+
         val matchResult = logic.process {
             tile?.tileResource?:-1
         }
